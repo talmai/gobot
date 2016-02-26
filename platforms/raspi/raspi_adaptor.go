@@ -277,6 +277,16 @@ func (r *RaspiAdaptor) I2cRead(address int, size int) (data []byte, err error) {
 	return
 }
 
+// I2cRead returns value from i2c device using specified size
+func (r *RaspiAdaptor) I2cReadRegister(address []byte, size int) (data []byte, err error) {
+	if err = r.i2cDevice.SetAddress(int(address[0])); err != nil {
+		return
+	}
+	data = make([]byte, size)
+	_, err = r.i2cDevice.ReadRegister(address[1:], data)
+	return
+}
+
 func (r *RaspiAdaptor) PwmWrite(pin string, val byte) (err error) {
 	sysfsPin, err := r.pwmPin(pin)
 	if err != nil {

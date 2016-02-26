@@ -31,6 +31,7 @@ type i2cSmbusIoctlData struct {
 type I2cDevice interface {
 	io.ReadWriteCloser
 	SetAddress(int) error
+	ReadRegister([]byte, []byte) (int, error)
 }
 
 type i2cDevice struct {
@@ -101,6 +102,39 @@ func (d *i2cDevice) Read(b []byte) (n int, err error) {
 	smbus := &i2cSmbusIoctlData{
 		readWrite: I2C_SMBUS_READ,
 		command:   0,
+		size:      I2C_SMBUS_I2C_BLOCK_DATA,
+		data:      uintptr(unsafe.Pointer(&data[0])),
+	}
+	_, _, errno := Syscall(
+		syscall.SYS_IOCTL,
+		d.file.Fd(),
+		I2C_SMBUS,
+		uintptr(unsafe.Pointer(smbus)),
+	)
+
+	if errno != 0 {
+		return n, fmt.Errorf("Read failed with syscall.Errno %v", errno)
+	}
+
+	copy(b, data[1:])
+
+	return int(data[0]), nil
+}
+
+func (d *i2cDevice) ReadRegister(address []byte, b []byte) (n int, err error) {
+	// if d.funcs&I2C_FUNC_SMBUS_READ_BLOCK_DATA == 0 {
+	// 	// Adapter doesn't support SMBus block read
+	// 	return d.file.Read(b)
+	// }
+
+	register := byte(address[0])
+
+	data := make([]byte, len(b)+1)
+	data[0] = byte(len(b))
+
+	smbus := &i2cSmbusIoctlData{
+		readWrite: I2C_SMBUS_READ,
+		command:   register,
 		size:      I2C_SMBUS_I2C_BLOCK_DATA,
 		data:      uintptr(unsafe.Pointer(&data[0])),
 	}
