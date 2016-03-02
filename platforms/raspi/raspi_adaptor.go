@@ -147,7 +147,10 @@ func NewRaspiAdaptor(name string) *RaspiAdaptor {
 
 	return r
 }
+
 func (r *RaspiAdaptor) Name() string { return r.name }
+
+func (r *RaspiAdaptor) IsPlatform() bool { return r.i2cLocation != "/dev/i2c-0" }
 
 // Connect starts conection with board and creates
 // digitalPins and pwmPins adaptor maps

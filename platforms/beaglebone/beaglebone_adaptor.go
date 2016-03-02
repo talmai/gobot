@@ -143,15 +143,18 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 	}
 
 	g, _ := glob(ocp)
-	b.ocp = g[0]
-	g, _ = glob(slots)
-	b.slots = fmt.Sprintf("%v/slots", g[0])
-
+	if len(g) > 0 {
+		b.ocp = g[0]
+		g, _ = glob(slots)
+		b.slots = fmt.Sprintf("%v/slots", g[0])
+	}
 	return b
 }
 
 // Name returns the BeagleboneAdaptors name
 func (b *BeagleboneAdaptor) Name() string { return b.name }
+
+func (b *BeagleboneAdaptor) IsPlatform() bool { return b.ocp != "" }
 
 // Connect initializes the pwm and analog dts.
 func (b *BeagleboneAdaptor) Connect() (errs []error) {
