@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
-	"github.com/hybridgroup/gobot/sysfs"
+	"github.com/talmai/gobot"
+	"github.com/talmai/gobot/platforms/i2c"
+	"github.com/talmai/gobot/sysfs"
 )
 
 var _ gobot.Adaptor = (*BeagleboneAdaptor)(nil)
