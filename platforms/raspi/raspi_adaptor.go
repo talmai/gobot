@@ -267,6 +267,15 @@ func (r *RaspiAdaptor) I2cWrite(address int, data []byte) (err error) {
 	return
 }
 
+// I2CWrite writes data to i2c device
+func (r *RaspiAdaptor) I2cWriteWord(address int, register uint8, value uint16) (err error) {
+	if err = r.i2cDevice.SetAddress(address); err != nil {
+		return
+	}
+	_, err = r.i2cDevice.WriteWord(register, value)
+	return
+}
+
 // I2cRead returns value from i2c device using specified size
 func (r *RaspiAdaptor) I2cRead(address int, size int) (data []byte, err error) {
 	if err = r.i2cDevice.SetAddress(address); err != nil {

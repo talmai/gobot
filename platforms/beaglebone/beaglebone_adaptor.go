@@ -280,6 +280,15 @@ func (b *BeagleboneAdaptor) I2cWrite(address int, data []byte) (err error) {
 	return
 }
 
+// I2CWrite writes data to i2c device
+func (b *BeagleboneAdaptor) I2cWriteWord(address int, register uint8, value uint16) (err error) {
+	if err = b.i2cDevice.SetAddress(address); err != nil {
+		return
+	}
+	_, err = b.i2cDevice.WriteWord(register, value)
+	return
+}
+
 // I2cRead returns size bytes from the i2c device
 func (b *BeagleboneAdaptor) I2cRead(address int, size int) (data []byte, err error) {
 	if err = b.i2cDevice.SetAddress(address); err != nil {
@@ -287,6 +296,16 @@ func (b *BeagleboneAdaptor) I2cRead(address int, size int) (data []byte, err err
 	}
 	data = make([]byte, size)
 	_, err = b.i2cDevice.Read(data)
+	return
+}
+
+// I2cRead returns value from i2c device using specified size
+func (b *BeagleboneAdaptor) I2cReadRegister(address []byte, size int) (data []byte, err error) {
+	if err = b.i2cDevice.SetAddress(int(address[0])); err != nil {
+		return
+	}
+	data = make([]byte, size)
+	_, err = b.i2cDevice.ReadRegister(address[1:], data)
 	return
 }
 
