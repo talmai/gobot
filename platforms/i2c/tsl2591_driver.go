@@ -67,3 +67,26 @@ func (b *Tsl2591Driver) ReadSensor() (local []byte, object []byte, errs []error)
 
 	return ambIR, iR, []error{errAmbIR, errIR}
 }
+
+/*
+
+// Read TSL2591 ALS
+function readAls() {
+    var dataCh0 = i2c.readWordSync(TSL2591_ADDR, TSL2591_C0DATAL_R);
+    console.log("Ambient light and IR");
+    console.log(dataCh0);
+    //localTemp = (swap16(localTemp))/128.0;
+
+    var dataCh1 = i2c.readWordSync(TSL2591_ADDR, TSL2591_C1DATAL_R);
+    console.log("IR only");
+    console.log(dataCh1);
+    //localTemp = (swap16(localTemp))/128.0;
+
+    // CPL = Count per lux = integration time / gain
+    cpl = 200/25.0;
+    // Calculate lux
+    lux = (dataCh0 - 2*dataCh1)/cpl;
+    console.log("The detected ambient light is "+ lux + " lx");
+}
+
+*/

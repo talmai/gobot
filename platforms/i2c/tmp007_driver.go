@@ -68,3 +68,18 @@ func (b *Tmp007Driver) swap16(val []byte) (data []byte) {
 	return ((val & 0xFF) << 8) | ((val >> 8) & 0xFF)
 }
 */
+
+/*
+
+// Read TMP007 thermopile sensor
+function readTempopile() {
+    var localTemp = i2c.readWordSync(TMP007_ADDR, TMP007_LOCAL_TEMP);
+    localTemp = (swap16(localTemp))/128.0;
+    console.log("The local temperature is:  " + localTemp.toString() + " degree C");
+
+    var objectTemp = i2c.readWordSync(TMP007_ADDR, TMP007_OBJ_TEMP);
+    objectTemp = (swap16(objectTemp))/128.0;
+    console.log("The object temperature is: " + objectTemp.toString() + " degree C");
+}
+
+*/
