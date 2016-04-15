@@ -38,3 +38,9 @@ type I2c interface {
 	I2cReader
 	I2cWriter
 }
+
+type I2cExtended interface {
+	I2c
+	I2cWriteWord(address int, register uint8, value uint16) (err error)
+	I2cReadRegister(address []byte, size int) (data []byte, err error)
+}

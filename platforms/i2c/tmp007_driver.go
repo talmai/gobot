@@ -1,0 +1,70 @@
+package i2c
+
+import (
+	"fmt"
+	"github.com/talmai/gobot"
+)
+
+var _ gobot.Driver = (*Tmp007Driver)(nil)
+
+// TMP007 thermopile definitions
+const tmp007Address = 0x40
+const tmp007LocalTemp = 0x01
+const tmp007ObjTemp = 0x03
+
+type Tmp007Driver struct {
+	name       string
+	connection I2cExtended
+	gobot.Commander
+	initialized bool
+}
+
+func NewTmp007Driver(i I2cExtended, name string) *Tmp007Driver {
+	b := &Tmp007Driver{
+		name:        name,
+		connection:  i,
+		Commander:   gobot.NewCommander(),
+		initialized: false,
+	}
+
+	b.AddCommand("Thermopile", func(params map[string]interface{}) interface{} {
+		local, object, err := b.ReadSensor()
+		return map[string]interface{}{"local": fmt.Sprintf("%X", local), "object": fmt.Sprintf("%X", object), "err": err}
+	})
+
+	return b
+}
+
+func (b *Tmp007Driver) Name() string                 { return b.name }
+func (b *Tmp007Driver) Connection() gobot.Connection { return b.connection.(gobot.Connection) }
+
+// Start writes start bytes
+func (b *Tmp007Driver) Start() (errs []error) {
+	b.initialized = true
+	return
+}
+
+// Halt returns true if device is halted successfully
+func (b *Tmp007Driver) Halt() (errs []error) { return }
+
+// Digital input
+func (b *Tmp007Driver) ReadSensor() (local []byte, object []byte, errs []error) {
+	localTemp, errLocal := b.connection.I2cReadRegister([]byte{tmp007Address, tmp007LocalTemp}, 2)
+	//	v := fmt.Fscanf(b.swap16(localTemp), "%f", &v)
+	//	fmt.Printf("The local temperature is:  [%X] %X degree C\n", localTemp, v/128.0)
+	// fmt.Printf("local %X \n", localTemp)
+
+	objectTemp, errObject := b.connection.I2cReadRegister([]byte{tmp007Address, tmp007ObjTemp}, 2)
+	// v = fmt.Fscanf(b.swap16(objectTemp), "%f", &v)
+	// fmt.Printf("The object temperature is:  [%X] %X degree C\n", objectTemp, v/128.0)
+	// fmt.Printf("object %X \n", objectTemp)
+
+	return localTemp, objectTemp, []error{errLocal, errObject}
+}
+
+/*
+// Swap bytes to change endianness
+func (b *Tmp007Driver) swap16(val []byte) (data []byte) {
+	return ((val & 0xFF) << 8) | ((val >> 8) & 0xFF)
+}
+*/

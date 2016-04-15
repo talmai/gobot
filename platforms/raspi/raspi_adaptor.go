@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hybridgroup/gobot/platforms/gpio"
 	"github.com/talmai/gobot"
+	"github.com/talmai/gobot/platforms/gpio"
 	"github.com/talmai/gobot/platforms/i2c"
 	"github.com/talmai/gobot/sysfs"
 )
@@ -20,6 +20,7 @@ var _ gpio.DigitalReader = (*RaspiAdaptor)(nil)
 var _ gpio.DigitalWriter = (*RaspiAdaptor)(nil)
 
 var _ i2c.I2c = (*RaspiAdaptor)(nil)
+var _ i2c.I2cExtended = (*RaspiAdaptor)(nil)
 
 var readFile = func() ([]byte, error) {
 	return ioutil.ReadFile("/proc/cpuinfo")

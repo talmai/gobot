@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hybridgroup/gobot/platforms/gpio"
 	"github.com/talmai/gobot"
+	"github.com/talmai/gobot/platforms/gpio"
 	"github.com/talmai/gobot/platforms/i2c"
 	"github.com/talmai/gobot/sysfs"
 )
@@ -24,6 +24,7 @@ var _ gpio.PwmWriter = (*BeagleboneAdaptor)(nil)
 var _ gpio.ServoWriter = (*BeagleboneAdaptor)(nil)
 
 var _ i2c.I2c = (*BeagleboneAdaptor)(nil)
+var _ i2c.I2cExtended = (*BeagleboneAdaptor)(nil)
 
 var slots = "/sys/devices/bone_capemgr.*"
 var ocp = "/sys/devices/ocp.*"
