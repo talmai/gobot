@@ -102,8 +102,8 @@ func (b *RIoTDriver) initializeRIoTInterfaceBoard() (errs []error) {
 
 // Digital input
 func (b *RIoTDriver) DigitalInput() (data []byte, errs []error) {
-	if err := initializeRIoTInterfaceBoard(); err != nil {
-		return []error{err}
+	if err := b.initializeRIoTInterfaceBoard(); err != nil {
+		return nil, []error{err}
 	}
 	// The lower four bits of “input” corresponding to digital input channel 0-3
 	data, err := b.connection.I2cReadRegister([]byte{RIOT_ADDRESS, RIOT_DIGITAL_INPUT_REGISTER}, 1)
@@ -112,7 +112,7 @@ func (b *RIoTDriver) DigitalInput() (data []byte, errs []error) {
 
 // Digital output
 func (b *RIoTDriver) DigitalOutput(channel byte) (errs []error) {
-	if err := initializeRIoTInterfaceBoard(); err != nil {
+	if err := b.initializeRIoTInterfaceBoard(); err != nil {
 		return []error{err}
 	}
 	if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, channel}); err != nil {
