@@ -8,13 +8,15 @@ import (
 var _ gobot.Driver = (*Tsl2591Driver)(nil)
 
 // TSL2591 ALS definitions
-const tsl2591Address = 0x29
-const tsl2591Command = 0x80
-const tsl2591NormalOp = 0x20
-const tsl2591EnableRW = tsl2591Command | tsl2591NormalOp | 0x00
-const tsl2591ConfigRW = tsl2591Command | tsl2591NormalOp | 0x01
-const tsl2591C0DataLR = tsl2591Command | tsl2591NormalOp | 0x14
-const tsl2591C1DataLR = tsl2591Command | tsl2591NormalOp | 0x16
+const (
+	TSL2591_ADDRESS    = 0x29
+	TSL2591_COMMAND    = 0x80
+	TSL2591_NORMAL_OP  = 0x20
+	TSL2591_ENABLE_RW  = TSL2591_COMMAND | TSL2591_NORMAL_OP | 0x00
+	TSL2591_CONFIG_RW  = TSL2591_COMMAND | TSL2591_NORMAL_OP | 0x01
+	TSL2591_C0_DATA_LR = TSL2591_COMMAND | TSL2591_NORMAL_OP | 0x14
+	TSL2591_C1_DATA_LR = TSL2591_COMMAND | TSL2591_NORMAL_OP | 0x16
+)
 
 type Tsl2591Driver struct {
 	name       string
@@ -31,7 +33,7 @@ func NewTsl2591Driver(i I2cExtended, name string) *Tsl2591Driver {
 		initialized: false,
 	}
 
-	b.AddCommand("LuxSensor", func(params map[string]interface{}) interface{} {
+	b.AddCommand("LuxInput", func(params map[string]interface{}) interface{} {
 		ambIR, iR, err := b.ReadSensor()
 		return map[string]interface{}{"AmbientIR": fmt.Sprintf("%X", ambIR), "IR": fmt.Sprintf("%X", iR), "err": err}
 	})
@@ -45,9 +47,9 @@ func (b *Tsl2591Driver) Connection() gobot.Connection { return b.connection.(gob
 // Start writes start bytes
 func (b *Tsl2591Driver) Start() (errs []error) {
 	if !b.initialized {
-		b.connection.I2cWriteWord(tsl2591Address, tsl2591EnableRW, 0x03)
+		b.connection.I2cWriteWord(TSL2591_ADDRESS, TSL2591_ENABLE_RW, 0x03)
 		// TSL2591_CONFIG_RW = 0x11: Medium gain mode, 200ms integration time
-		b.connection.I2cWriteWord(tsl2591Address, tsl2591ConfigRW, 0x11)
+		b.connection.I2cWriteWord(TSL2591_ADDRESS, TSL2591_CONFIG_RW, 0x11)
 
 		b.initialized = true
 	}
@@ -59,10 +61,10 @@ func (b *Tsl2591Driver) Halt() (errs []error) { return }
 
 // Digital input
 func (b *Tsl2591Driver) ReadSensor() (local []byte, object []byte, errs []error) {
-	ambIR, errAmbIR := b.connection.I2cReadRegister([]byte{tsl2591Address, tsl2591C0DataLR}, 2)
+	ambIR, errAmbIR := b.connection.I2cReadRegister([]byte{TSL2591_ADDRESS, TSL2591_C0_DATA_LR}, 2)
 	fmt.Printf("ambIR %X \n", ambIR)
 
-	iR, errIR := b.connection.I2cReadRegister([]byte{tsl2591Address, tsl2591C1DataLR}, 2)
+	iR, errIR := b.connection.I2cReadRegister([]byte{TSL2591_ADDRESS, TSL2591_C1_DATA_LR}, 2)
 	fmt.Printf("ambIR %X \n", iR)
 
 	return ambIR, iR, []error{errAmbIR, errIR}

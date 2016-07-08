@@ -8,9 +8,11 @@ import (
 var _ gobot.Driver = (*Tmp007Driver)(nil)
 
 // TMP007 thermopile definitions
-const tmp007Address = 0x40
-const tmp007LocalTemp = 0x01
-const tmp007ObjTemp = 0x03
+const (
+	TMP007_ADDRESS            = 0x40
+	TMP007_LOCAL_TEMPERATURE  = 0x01
+	TMP007_OBJECT_TEMPERATURE = 0x03
+)
 
 type Tmp007Driver struct {
 	name       string
@@ -27,7 +29,7 @@ func NewTmp007Driver(i I2cExtended, name string) *Tmp007Driver {
 		initialized: false,
 	}
 
-	b.AddCommand("Thermopile", func(params map[string]interface{}) interface{} {
+	b.AddCommand("ThermopileInput", func(params map[string]interface{}) interface{} {
 		local, object, err := b.ReadSensor()
 		return map[string]interface{}{"local": fmt.Sprintf("%X", local), "object": fmt.Sprintf("%X", object), "err": err}
 	})
@@ -49,12 +51,12 @@ func (b *Tmp007Driver) Halt() (errs []error) { return }
 
 // Digital input
 func (b *Tmp007Driver) ReadSensor() (local []byte, object []byte, errs []error) {
-	localTemp, errLocal := b.connection.I2cReadRegister([]byte{tmp007Address, tmp007LocalTemp}, 2)
+	localTemp, errLocal := b.connection.I2cReadRegister([]byte{TMP007_ADDRESS, TMP007_LOCAL_TEMPERATURE}, 2)
 	//	v := fmt.Fscanf(b.swap16(localTemp), "%f", &v)
 	//	fmt.Printf("The local temperature is:  [%X] %X degree C\n", localTemp, v/128.0)
 	// fmt.Printf("local %X \n", localTemp)
 
-	objectTemp, errObject := b.connection.I2cReadRegister([]byte{tmp007Address, tmp007ObjTemp}, 2)
+	objectTemp, errObject := b.connection.I2cReadRegister([]byte{TMP007_ADDRESS, TMP007_OBJECT_TEMPERATURE}, 2)
 	// v = fmt.Fscanf(b.swap16(objectTemp), "%f", &v)
 	// fmt.Printf("The object temperature is:  [%X] %X degree C\n", objectTemp, v/128.0)
 	// fmt.Printf("object %X \n", objectTemp)
