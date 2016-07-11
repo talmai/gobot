@@ -123,11 +123,10 @@ func (b *RIoTDriver) SetDigitalOutput(channel byte) (errs []error) {
 	}
 	// read current register value
 	data, err := b.ReadDigitalInput()
-	if err != nil {
-		return []error{err}
-	}
-	if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data | channel}); err != nil {
-		return []error{err}
+	if err == nil {
+		if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data[0] | channel}); err != nil {
+			return
+		}
 	}
 	return
 }
