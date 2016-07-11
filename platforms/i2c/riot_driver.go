@@ -122,10 +122,11 @@ func (b *RIoTDriver) SetDigitalOutput(channel byte) (errs []error) {
 		return
 	}
 	// read current register value
-	if data, err := b.ReadDigitalInput(); err != nil {
+	data, err := b.ReadDigitalInput()
+	if err != nil {
 		return []error{err}
 	}
-	if err = b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data | channel}); err != nil {
+	if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data | channel}); err != nil {
 		return []error{err}
 	}
 	return
@@ -133,16 +134,18 @@ func (b *RIoTDriver) SetDigitalOutput(channel byte) (errs []error) {
 
 // Digital output
 func (b *RIoTDriver) ResetDigitalOutput(channel byte) (errs []error) {
-	if err := b.initializeRIoTInterfaceBoard(); err != nil {
-		return
-	}
-	// read current register value
-	data, err := b.ReadDigitalInput()
-	if err = b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, channel}); err != nil {
-		return []error{err}
-	}
-	if err = b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, channel}); err != nil {
-		return []error{err}
-	}
+	/*
+		if err := b.initializeRIoTInterfaceBoard(); err != nil {
+			return
+		}
+		// read current register value
+		data, err := b.ReadDigitalInput()
+		if err = b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, channel}); err != nil {
+			return []error{err}
+		}
+		if err = b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, channel}); err != nil {
+			return []error{err}
+		}
+	*/
 	return
 }
