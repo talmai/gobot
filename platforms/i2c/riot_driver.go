@@ -128,7 +128,9 @@ func (b *RIoTDriver) SetDigitalOutput(channel byte) (errs []error) {
 	fmt.Printf("[ch]-> %X %X %X\n", channel, data[0]|channel)
 
 	if err == nil {
+		fmt.Printf("1 err == nil")
 		if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data[1] | channel}); err != nil {
+			fmt.Printf("2 err not nil")
 			return
 		}
 	}
