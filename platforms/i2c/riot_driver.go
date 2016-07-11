@@ -123,14 +123,13 @@ func (b *RIoTDriver) SetDigitalOutput(channel byte) (errs []error) {
 	}
 	// read current register value
 	data, _ := b.ReadDigitalInput()
-	fmt.Printf("[0]-> %X %X %X %X %X\n", data, data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3)
-	fmt.Printf("[1]-> %X %X %X %X %X\n", data, data[0]&0X10>>4, data[0]&0X20>>5, data[0]&0X40>>6, data[0]&0X80>>7)
-	fmt.Printf("[ch]-> %X %X %X\n", channel, data[0]|channel)
-
-	if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data[0] | channel}); err != nil {
-		fmt.Printf("2 err not nil")
-		return
-	}
+	// fmt.Printf("[0]-> %X %X %X %X %X\n", data, data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3)
+	// fmt.Printf("[1]-> %X %X %X %X %X\n", data, data[0]&0X10>>4, data[0]&0X20>>5, data[0]&0X40>>6, data[0]&0X80>>7)
+	// fmt.Printf("[ch]-> %X %X %X\n", channel, data[0]|channel)
+	b.connection.I2cWriteWord(RIOT_ADDRESS, RIOT_DIGITAL_OUTPUT_REGISTER, data[0]|channel)
+	// if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data[0] | channel}); err != nil {
+	// 	return
+	// }
 	return
 }
 
