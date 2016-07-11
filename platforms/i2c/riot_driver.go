@@ -45,8 +45,8 @@ func NewRIoTDriver(i I2cExtended, name string) *RIoTDriver {
 		digitalIoInitialized: false,
 	}
 
-	b.AddCommand("DigitalInput", func(params map[string]interface{}) interface{} {
-		data, err := b.DigitalInput()
+	b.AddCommand("ReadDigitalInput", func(params map[string]interface{}) interface{} {
+		data, err := b.ReadDigitalInput()
 		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
 	})
 
@@ -122,7 +122,7 @@ func (b *RIoTDriver) SetDigitalOutput(channel byte) (errs []error) {
 		return
 	}
 	// read current register value
-	if data, err = b.DigitalInput(); err != nil {
+	if data, err = b.ReadDigitalInput(); err != nil {
 		return []error{err}
 	}
 	if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data | channel}); err != nil {
@@ -137,7 +137,7 @@ func (b *RIoTDriver) ResetDigitalOutput(channel byte) (errs []error) {
 		return
 	}
 	// read current register value
-	data, err = b.DigitalInput()
+	data, err = b.ReadDigitalInput()
 	if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, channel}); err != nil {
 		return []error{err}
 	}
