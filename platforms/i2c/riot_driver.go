@@ -55,8 +55,18 @@ func NewRIoTDriver(i I2cExtended, name string) *RIoTDriver {
 		return map[string]interface{}{"err": err}
 	})
 
+	b.AddCommand("ResetDigitalOutputChannelZero", func(params map[string]interface{}) interface{} {
+		err := b.SetDigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO_RESET)
+		return map[string]interface{}{"err": err}
+	})
+
 	b.AddCommand("SetDigitalOutputChannelOne", func(params map[string]interface{}) interface{} {
 		err := b.SetDigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE_SET)
+		return map[string]interface{}{"err": err}
+	})
+
+	b.AddCommand("SetDigitalOutputChannelOne", func(params map[string]interface{}) interface{} {
+		err := b.SetDigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE_RESET)
 		return map[string]interface{}{"err": err}
 	})
 
@@ -65,8 +75,18 @@ func NewRIoTDriver(i I2cExtended, name string) *RIoTDriver {
 		return map[string]interface{}{"err": err}
 	})
 
+	b.AddCommand("ResetRelayOutputChannelZero", func(params map[string]interface{}) interface{} {
+		err := b.SetDigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO_ON)
+		return map[string]interface{}{"err": err}
+	})
+
 	b.AddCommand("SetRelayOutputChannelOne", func(params map[string]interface{}) interface{} {
 		err := b.SetDigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE_OFF)
+		return map[string]interface{}{"err": err}
+	})
+
+	b.AddCommand("ResetRelayOutputChannelOne", func(params map[string]interface{}) interface{} {
+		err := b.SetDigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE_ON)
 		return map[string]interface{}{"err": err}
 	})
 
@@ -130,23 +150,5 @@ func (b *RIoTDriver) SetDigitalOutput(channel byte) (errs []error) {
 	// if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data[0] | channel}); err != nil {
 	// 	return
 	// }
-	return
-}
-
-// Digital output
-func (b *RIoTDriver) ResetDigitalOutput(channel byte) (errs []error) {
-	/*
-		if err := b.initializeRIoTInterfaceBoard(); err != nil {
-			return
-		}
-		// read current register value
-		data, err := b.ReadDigitalInput()
-		if err = b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, channel}); err != nil {
-			return []error{err}
-		}
-		if err = b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, channel}); err != nil {
-			return []error{err}
-		}
-	*/
 	return
 }
