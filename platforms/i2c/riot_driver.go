@@ -16,10 +16,16 @@ const (
 	RIOT_DIGITAL_INPUT_REGISTER  = 0x09
 	RIOT_DIGITAL_OUTPUT_REGISTER = 0x0A
 
-	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO   = 0x01
-	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE    = 0x02
-	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO = 0x04
-	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE  = 0x08
+	// relays are NORMALLY CLOSED (even if the relay fails, lights continue on)
+	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO_OFF = 0x10
+	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO_ON  = 0xEF
+	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE_OFF  = 0x20
+	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE_ON   = 0xDF
+
+	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO_SET   = 0x40
+	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO_RESET = 0xBF
+	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE_SET    = 0x80
+	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE_RESET  = 0x7F
 )
 
 type RIoTDriver struct {
@@ -44,23 +50,23 @@ func NewRIoTDriver(i I2cExtended, name string) *RIoTDriver {
 		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
 	})
 
-	b.AddCommand("DigitalOutputChannelZero", func(params map[string]interface{}) interface{} {
-		err := b.DigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO)
+	b.AddCommand("SetDigitalOutputChannelZero", func(params map[string]interface{}) interface{} {
+		err := b.SetDigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO)
 		return map[string]interface{}{"err": err}
 	})
 
-	b.AddCommand("DigitalOutputChannelOne", func(params map[string]interface{}) interface{} {
-		err := b.DigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE)
+	b.AddCommand("SetDigitalOutputChannelOne", func(params map[string]interface{}) interface{} {
+		err := b.SetDigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE)
 		return map[string]interface{}{"err": err}
 	})
 
-	b.AddCommand("RelayOutputChannelZero", func(params map[string]interface{}) interface{} {
-		err := b.DigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO)
+	b.AddCommand("SetRelayOutputChannelZero", func(params map[string]interface{}) interface{} {
+		err := b.SetDigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO)
 		return map[string]interface{}{"err": err}
 	})
 
-	b.AddCommand("RelayOutputChannelOne", func(params map[string]interface{}) interface{} {
-		err := b.DigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE)
+	b.AddCommand("SetRelayOutputChannelOne", func(params map[string]interface{}) interface{} {
+		err := b.SetDigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE)
 		return map[string]interface{}{"err": err}
 	})
 
@@ -101,7 +107,7 @@ func (b *RIoTDriver) initializeRIoTInterfaceBoard() (errs []error) {
 }
 
 // Digital input
-func (b *RIoTDriver) DigitalInput() (data []byte, errs []error) {
+func (b *RIoTDriver) ReadDigitalInput() (data []byte, errs []error) {
 	if err := b.initializeRIoTInterfaceBoard(); err != nil {
 		return
 	}
@@ -111,9 +117,29 @@ func (b *RIoTDriver) DigitalInput() (data []byte, errs []error) {
 }
 
 // Digital output
-func (b *RIoTDriver) DigitalOutput(channel byte) (errs []error) {
+func (b *RIoTDriver) SetDigitalOutput(channel byte) (errs []error) {
 	if err := b.initializeRIoTInterfaceBoard(); err != nil {
 		return
+	}
+	// read current register value
+	if data, err = b.DigitalInput(); err != nil {
+		return []error{err}
+	}
+	if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data | channel}); err != nil {
+		return []error{err}
+	}
+	return
+}
+
+// Digital output
+func (b *RIoTDriver) ResetDigitalOutput(channel byte) (errs []error) {
+	if err := b.initializeRIoTInterfaceBoard(); err != nil {
+		return
+	}
+	// read current register value
+	data, err = b.DigitalInput()
+	if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, channel}); err != nil {
+		return []error{err}
 	}
 	if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, channel}); err != nil {
 		return []error{err}
