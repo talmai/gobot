@@ -51,22 +51,22 @@ func NewRIoTDriver(i I2cExtended, name string) *RIoTDriver {
 	})
 
 	b.AddCommand("SetDigitalOutputChannelZero", func(params map[string]interface{}) interface{} {
-		err := b.SetDigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO)
+		err := b.SetDigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO_SET)
 		return map[string]interface{}{"err": err}
 	})
 
 	b.AddCommand("SetDigitalOutputChannelOne", func(params map[string]interface{}) interface{} {
-		err := b.SetDigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE)
+		err := b.SetDigitalOutput(RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE_SET)
 		return map[string]interface{}{"err": err}
 	})
 
 	b.AddCommand("SetRelayOutputChannelZero", func(params map[string]interface{}) interface{} {
-		err := b.SetDigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO)
+		err := b.SetDigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO_OFF)
 		return map[string]interface{}{"err": err}
 	})
 
 	b.AddCommand("SetRelayOutputChannelOne", func(params map[string]interface{}) interface{} {
-		err := b.SetDigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE)
+		err := b.SetDigitalOutput(RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE_OFF)
 		return map[string]interface{}{"err": err}
 	})
 
