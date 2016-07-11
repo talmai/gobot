@@ -124,7 +124,7 @@ func (b *RIoTDriver) SetDigitalOutput(channel byte) (errs []error) {
 	// read current register value
 	data, err := b.ReadDigitalInput()
 	fmt.Printf("[0]-> %X %X %X %X %X\n", data, data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3)
-	fmt.Printf("[1]-> %X %X %X %X %X\n", data, data[1]&0X01, data[1]&0X02>>1, data[1]&0X04>>2, data[1]&0X08>>3)
+	fmt.Printf("[1]-> %X %X\n", data, data[1])
 	fmt.Printf("[ch]-> %X %X %X\n", channel, data[0]|channel, data[1]|channel)
 
 	if err == nil {
