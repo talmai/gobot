@@ -16,6 +16,8 @@ const (
 	RIOT_DIGITAL_INPUT_REGISTER  = 0x09
 	RIOT_DIGITAL_OUTPUT_REGISTER = 0x0A
 
+	RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS = 0x61
+
 	// relays are NORMALLY CLOSED (even if the relay fails, lights continue on)
 	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO_OFF = 0x10
 	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO_ON  = 0xEF
@@ -90,6 +92,16 @@ func NewRIoTDriver(i I2cExtended, name string) *RIoTDriver {
 		return map[string]interface{}{"err": err}
 	})
 
+	b.AddCommand("DimLuminaireUp", func(params map[string]interface{}) interface{} {
+		err := b.SetDigitalAnalogConverter(0x0F, 0xFF)
+		return map[string]interface{}{"err": err}
+	})
+
+	b.AddCommand("DimLuminaireDown", func(params map[string]interface{}) interface{} {
+		err := b.SetDigitalAnalogConverter(0x00, 0x00)
+		return map[string]interface{}{"err": err}
+	})
+
 	return b
 }
 
@@ -144,10 +156,7 @@ func (b *RIoTDriver) SetDigitalOutput(channel byte) (errs []error) {
 	// read current register value
 	data, _ := b.ReadDigitalInput()
 
-	// fmt.Printf("[0]-> %X %X %X %X %X\n", data, data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3)
-	// fmt.Printf("[1]-> %X %X %X %X %X\n", data, data[0]&0X10>>4, data[0]&0X20>>5, data[0]&0X40>>6, data[0]&0X80>>7)
-	// fmt.Printf("[ch]-> %X %X %X\n", channel, data[0]|channel)
-
+	// fmt.Printf("[0]-> %X %X %X %X %X\n", data, data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3) // fmt.Printf("[1]-> %X %X %X %X %X\n", data, data[0]&0X10>>4, data[0]&0X20>>5, data[0]&0X40>>6, data[0]&0X80>>7) // fmt.Printf("[ch]-> %X %X %X\n", channel, data[0]|channel)
 	b.connection.I2cWriteWord(RIOT_ADDRESS, RIOT_DIGITAL_OUTPUT_REGISTER, uint16(data[0]|channel))
 	// if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data[0] | channel}); err != nil {
 	// 	return
@@ -168,6 +177,19 @@ func (b *RIoTDriver) ResetDigitalOutput(channel byte) (errs []error) {
 	fmt.Printf("[ch]-> %X %X %X\n", channel, data[0]&channel)
 
 	b.connection.I2cWriteWord(RIOT_ADDRESS, RIOT_DIGITAL_OUTPUT_REGISTER, uint16(data[0]&channel))
+	// if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data[0] | channel}); err != nil {
+	// 	return
+	// }
+	return
+}
+
+// Digital Analog Converter
+func (b *RIoTDriver) SetDigitalAnalogConverter(value01 byte, value02 byte) (errs []error) {
+	if err := b.initializeRIoTInterfaceBoard(); err != nil {
+		return
+	}
+
+	b.connection.I2cWriteWord(RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS, value01, value02)
 	// if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data[0] | channel}); err != nil {
 	// 	return
 	// }
