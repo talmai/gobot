@@ -184,7 +184,7 @@ func (b *RIoTDriver) ResetDigitalOutput(channel byte) (errs []error) {
 }
 
 // Digital Analog Converter
-func (b *RIoTDriver) SetDigitalAnalogConverter(value01 byte, value02 byte) (errs []error) {
+func (b *RIoTDriver) SetDigitalAnalogConverter(value01 byte, value02 uint16) (errs []error) {
 	if err := b.initializeRIoTInterfaceBoard(); err != nil {
 		return
 	}
