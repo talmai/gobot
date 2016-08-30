@@ -49,7 +49,8 @@ func (b *Tsl2591Driver) Start() (errs []error) {
 	if !b.initialized {
 		b.connection.I2cWriteWord(TSL2591_ADDRESS, TSL2591_ENABLE_RW, 0x03)
 		// TSL2591_CONFIG_RW = 0x11: Medium gain mode, 200ms integration time
-		b.connection.I2cWriteWord(TSL2591_ADDRESS, TSL2591_CONFIG_RW, 0x11)
+		//		b.connection.I2cWriteWord(TSL2591_ADDRESS, TSL2591_CONFIG_RW, 0x11)
+		b.connection.I2cWriteWord(TSL2591_ADDRESS, TSL2591_CONFIG_RW, 0x03)
 
 		b.initialized = true
 	}
