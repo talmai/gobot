@@ -65,7 +65,7 @@ func (b *Tsl2591Driver) ReadSensor() (local []byte, object []byte, errs []error)
 	fmt.Printf("ambIR %X \n", ambIR)
 
 	iR, errIR := b.connection.I2cReadRegister([]byte{TSL2591_ADDRESS, TSL2591_C1_DATA_LR}, 2)
-	fmt.Printf("ambIR %X \n", iR)
+	fmt.Printf("ir %X \n", iR)
 
 	return ambIR, iR, []error{errAmbIR, errIR}
 }
