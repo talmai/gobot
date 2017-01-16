@@ -13,25 +13,34 @@ const (
 	RIOT_INITIALIZATION_ADDRESS_01 = 0x00
 	RIOT_INITIALIZATION_ADDRESS_02 = 0x01
 
-	RIOT_DIGITAL_INPUT_REGISTER  = 0x09
-	RIOT_DIGITAL_OUTPUT_REGISTER = 0x0A
-
-	RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS_ONE = 0x60
-	RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS_TWO = 0x61
-
 	// relays are NORMALLY CLOSED (even if the relay fails, lights continue on)
 	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO_OFF = 0x10
 	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO_ON  = 0xEF
 	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE_OFF  = 0x20
 	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ONE_ON   = 0xDF
 
+	// DAC
+	RIOT_DIGITAL_INPUT_REGISTER  = 0x09
+	RIOT_DIGITAL_OUTPUT_REGISTER = 0x0A
+
+	RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS_ONE = 0x60
+	RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS_TWO = 0x61
+
 	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO_SET   = 0x40
 	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO_RESET = 0xBF
 	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE_SET    = 0x80
 	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE_RESET  = 0x7F
 
+	// ADC
+	RIOT_ANALOG_TO_DIGITAL_OUTPUT_REGISTER = 0x00
+	RIOT_ANALOG_TO_DIGITAL_INIT_REGISTER   = 0x01
+
 	RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS = 0x49
-	RIOT_ANALOG_OUTPUT_REGISTER                    = 0x00
+
+	RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_ZERO  = 0x83C5
+	RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_ONE   = 0x83D5
+	RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_TWO   = 0x83E5
+	RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_THREE = 0x83F5
 )
 
 type RIoTDriver struct {
@@ -106,8 +115,23 @@ func NewRIoTDriver(i I2cExtended, name string) *RIoTDriver {
 		return map[string]interface{}{"err": err}
 	})
 
-	b.AddCommand("ReadADC", func(params map[string]interface{}) interface{} {
-		data, err := b.ReadADC(0x01, 0x83C5)
+	b.AddCommand("ReadADCChannelZero", func(params map[string]interface{}) interface{} {
+		data, err := b.ReadADC(RIOT_ANALOG_TO_DIGITAL_INIT_REGISTER, RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_ZERO)
+		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
+	})
+
+	b.AddCommand("ReadADCChannelOne", func(params map[string]interface{}) interface{} {
+		data, err := b.ReadADC(RIOT_ANALOG_TO_DIGITAL_INIT_REGISTER, RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_ONE)
+		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
+	})
+
+	b.AddCommand("ReadADCChannelTwo", func(params map[string]interface{}) interface{} {
+		data, err := b.ReadADC(RIOT_ANALOG_TO_DIGITAL_INIT_REGISTER, RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_TWO)
+		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
+	})
+
+	b.AddCommand("ReadADCChannelThree", func(params map[string]interface{}) interface{} {
+		data, err := b.ReadADC(RIOT_ANALOG_TO_DIGITAL_INIT_REGISTER, RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_THREE)
 		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
 	})
 
@@ -212,7 +236,7 @@ func (b *RIoTDriver) ReadADC(value01 byte, value02 uint16) (data []byte, errs []
 	}
 	b.connection.I2cWriteWord(RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS, value01, value02)
 
-	data, err := b.connection.I2cReadRegister([]byte{RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS, RIOT_ANALOG_OUTPUT_REGISTER}, 2) // 2 == 2 bytes == word
+	data, err := b.connection.I2cReadRegister([]byte{RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS, RIOT_ANALOG_TO_DIGITAL_OUTPUT_REGISTER}, 2) // 2 == 2 bytes == word
 	fmt.Printf("data %X \n", data)
 	return data, []error{err}
 }
