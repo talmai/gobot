@@ -16,7 +16,8 @@ const (
 	RIOT_DIGITAL_INPUT_REGISTER  = 0x09
 	RIOT_DIGITAL_OUTPUT_REGISTER = 0x0A
 
-	RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS = 0x61
+	RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS_ONE = 0x60
+	RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS_TWO = 0x61
 
 	// relays are NORMALLY CLOSED (even if the relay fails, lights continue on)
 	RIOT_GPIO_RELAY_OUTPUT_CHANNEL_ZERO_OFF = 0x10
@@ -28,6 +29,9 @@ const (
 	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ZERO_RESET = 0xBF
 	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE_SET    = 0x80
 	RIOT_GPIO_DIGITAL_OUTPUT_CHANNEL_ONE_RESET  = 0x7F
+
+	RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS = 0x49
+	RIOT_ANALOG_OUTPUT_REGISTER                    = 0x00
 )
 
 type RIoTDriver struct {
@@ -100,6 +104,11 @@ func NewRIoTDriver(i I2cExtended, name string) *RIoTDriver {
 	b.AddCommand("DimLuminaireDown", func(params map[string]interface{}) interface{} {
 		err := b.SetDigitalAnalogConverter(0x00, 0x00)
 		return map[string]interface{}{"err": err}
+	})
+
+	b.AddCommand("ReadADC", func(params map[string]interface{}) interface{} {
+		data, err := b.ReadADC(0x01, 0x83C5)
+		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
 	})
 
 	return b
@@ -189,9 +198,21 @@ func (b *RIoTDriver) SetDigitalAnalogConverter(value01 byte, value02 uint16) (er
 		return
 	}
 
-	b.connection.I2cWriteWord(RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS, value01, value02)
+	b.connection.I2cWriteWord(RIOT_DIGITAL_TO_ANALOG_CONVERTER_SLAVE_ADDRESS_TWO, value01, value02)
 	// if err := b.connection.I2cWrite(RIOT_ADDRESS, []byte{RIOT_DIGITAL_OUTPUT_REGISTER, data[0] | channel}); err != nil {
 	// 	return
 	// }
 	return
+}
+
+// Analog to Digital Converter
+func (b *RIoTDriver) ReadADC(value01 byte, value02 uint16) (data []byte, errs []error) {
+	if err := b.initializeRIoTInterfaceBoard(); err != nil {
+		return
+	}
+	b.connection.I2cWriteWord(RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS, value01, value02)
+
+	data, err := b.connection.I2cReadRegister([]byte{RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS, RIOT_ANALOG_OUTPUT_REGISTER}, 1)
+	fmt.Printf("data %X \n", data)
+	return data, []error{err}
 }
