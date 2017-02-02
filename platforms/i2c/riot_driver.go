@@ -117,22 +117,22 @@ func NewRIoTDriver(i I2cExtended, name string) *RIoTDriver {
 
 	b.AddCommand("ReadADCChannelZero", func(params map[string]interface{}) interface{} {
 		data, err := b.ReadADC(RIOT_ANALOG_TO_DIGITAL_INIT_REGISTER, RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_ZERO)
-		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
+		return map[string]interface{}{"raw": fmt.Sprintf("%X%X%X%X%X", data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3, data), "err": err}
 	})
 
 	b.AddCommand("ReadADCChannelOne", func(params map[string]interface{}) interface{} {
 		data, err := b.ReadADC(RIOT_ANALOG_TO_DIGITAL_INIT_REGISTER, RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_ONE)
-		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
+		return map[string]interface{}{"raw": fmt.Sprintf("%X%X%X%X%X", data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3, data), "err": err}
 	})
 
 	b.AddCommand("ReadADCChannelTwo", func(params map[string]interface{}) interface{} {
 		data, err := b.ReadADC(RIOT_ANALOG_TO_DIGITAL_INIT_REGISTER, RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_TWO)
-		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
+		return map[string]interface{}{"raw": fmt.Sprintf("%X%X%X%X%X", data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3, data), "err": err}
 	})
 
 	b.AddCommand("ReadADCChannelThree", func(params map[string]interface{}) interface{} {
 		data, err := b.ReadADC(RIOT_ANALOG_TO_DIGITAL_INIT_REGISTER, RIOT_ANALOG_TO_DIGITAL_CONVERTER_INPUT_CHANNEL_THREE)
-		return map[string]interface{}{"raw": fmt.Sprintf("%X", data), "digitalInput01": fmt.Sprintf("%X", data[0]&0X01), "digitalInput02": fmt.Sprintf("%X", data[0]&0X02>>1), "digitalInput03": fmt.Sprintf("%X", data[0]&0X04>>2), "digitalInput04": fmt.Sprintf("%X", data[0]&0X08>>3), "err": err}
+		return map[string]interface{}{"raw": fmt.Sprintf("%X%X%X%X%X", data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3, data), "err": err}
 	})
 
 	return b
@@ -237,11 +237,6 @@ func (b *RIoTDriver) ReadADC(value01 byte, value02 uint16) (data []byte, errs []
 	b.connection.I2cWriteWord(RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS, value01, value02)
 
 	data, err := b.connection.I2cReadRegister([]byte{RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS, RIOT_ANALOG_TO_DIGITAL_OUTPUT_REGISTER}, 2) // 2 == 2 bytes == word
-	fmt.Printf("data[s] %s \n", data)
-	fmt.Printf("data[X] %X \n", data)
-	fmt.Printf("data[0] %X \n", data[0])
-	fmt.Printf("data[1] %X \n", data[1])
-	fmt.Printf("[0]-> %X %X %X %X %X\n", data, data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3)
-	fmt.Printf("[1]-> %X %X %X %X %X\n", data, data[0]&0X10>>4, data[0]&0X20>>5, data[0]&0X40>>6, data[0]&0X80>>7)
+	fmt.Printf("data -> %X %X %X %X %X\n", data, data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3)
 	return data, []error{err}
 }
