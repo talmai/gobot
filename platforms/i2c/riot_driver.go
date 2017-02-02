@@ -237,6 +237,8 @@ func (b *RIoTDriver) ReadADC(value01 byte, value02 uint16) (data []byte, errs []
 	b.connection.I2cWriteWord(RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS, value01, value02)
 
 	data, err := b.connection.I2cReadRegister([]byte{RIOT_ANALOG_TO_DIGITAL_CONVERTER_SLAVE_ADDRESS, RIOT_ANALOG_TO_DIGITAL_OUTPUT_REGISTER}, 2) // 2 == 2 bytes == word
+
+	// for now, prints out WORD (but returns full byte array)
 	fmt.Printf("data -> %X %X %X %X %X\n", data, data[0]&0X01, data[0]&0X02>>1, data[0]&0X04>>2, data[0]&0X08>>3)
 	return data, []error{err}
 }
