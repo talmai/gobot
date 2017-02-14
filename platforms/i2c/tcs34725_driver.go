@@ -88,15 +88,15 @@ func (b *Tcs34725Driver) ReadSensor() (redB []byte, greenB []byte, blueB []byte,
 
 	// Read red data
 	redData, errRed := b.connection.I2cReadRegister([]byte{TCS34725_ADDR, TCS34725_RDATAL_R}, 2)
-	fmt.Printf("redData %X \n", ambIR)
+	fmt.Printf("redData %X \n", redData)
 
 	// Read green data
 	greenData, errGreen := b.connection.I2cReadRegister([]byte{TCS34725_ADDR, TCS34725_RDATAL_R}, 2)
-	fmt.Printf("greenData %X \n", iR)
+	fmt.Printf("greenData %X \n", greenData)
 
 	// Read blue data
 	blueData, errBlue := b.connection.I2cReadRegister([]byte{TCS34725_ADDR, TCS34725_RDATAL_R}, 2)
-	fmt.Printf("blueData %X \n", ambIR)
+	fmt.Printf("blueData %X \n", blueData)
 
 	return redData, greenData, blueData, []error{errRed, errGreen, errBlue}
 }
