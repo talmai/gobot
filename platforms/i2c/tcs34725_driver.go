@@ -56,7 +56,7 @@ func NewTcs34725Driver(i I2cExtended, name string) *Tcs34725Driver {
 
 	b.AddCommand("ColorSensorInput", func(params map[string]interface{}) interface{} {
 		redData, greenData, blueData, err := b.ReadSensor()
-		return map[string]interface{}{"Red": fmt.Sprintf("%X", redData), "Green": fmt.Sprintf("%X", greenData), "Blue": fmt.Sprintf("%X", ColorSensorInput), "err": err}
+		return map[string]interface{}{"Red": fmt.Sprintf("%X", redData), "Green": fmt.Sprintf("%X", greenData), "Blue": fmt.Sprintf("%X", blueData), "err": err}
 	})
 
 	return b
