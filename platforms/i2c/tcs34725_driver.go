@@ -84,7 +84,7 @@ func (b *Tcs34725Driver) Start() (errs []error) {
 func (b *Tcs34725Driver) Halt() (errs []error) { return }
 
 // Digital input
-func (b *Tcs34725Driver) ReadSensor() (local []byte, object []byte, errs []error) {
+func (b *Tcs34725Driver) ReadSensor() (redB []byte, greenB []byte, blueB []byte, errs []error) {
 
 	// Read red data
 	redData, errRed := b.connection.I2cReadRegister([]byte{TCS34725_ADDR, TCS34725_RDATAL_R}, 2)
