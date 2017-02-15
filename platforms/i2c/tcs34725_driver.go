@@ -83,20 +83,20 @@ func (b *Tcs34725Driver) Start() (errs []error) {
 // Halt returns true if device is halted successfully
 func (b *Tcs34725Driver) Halt() (errs []error) { return }
 
-// Digital input
+// Color Sensor input
 func (b *Tcs34725Driver) ReadSensor() (redB []byte, greenB []byte, blueB []byte, errs []error) {
 
 	// Read red data
 	redData, errRed := b.connection.I2cReadRegister([]byte{TCS34725_ADDR, TCS34725_RDATAL_R}, 2)
-	fmt.Printf("redData %X \n", redData)
+	fmt.Printf("redData %X [%X]\n", redData, errRed)
 
 	// Read green data
-	greenData, errGreen := b.connection.I2cReadRegister([]byte{TCS34725_ADDR, TCS34725_RDATAL_R}, 2)
-	fmt.Printf("greenData %X \n", greenData)
+	greenData, errGreen := b.connection.I2cReadRegister([]byte{TCS34725_ADDR, TCS34725_GDATAL_R}, 2)
+	fmt.Printf("greenData %X [%X]\n", greenData, errRed)
 
 	// Read blue data
-	blueData, errBlue := b.connection.I2cReadRegister([]byte{TCS34725_ADDR, TCS34725_RDATAL_R}, 2)
-	fmt.Printf("blueData %X \n", blueData)
+	blueData, errBlue := b.connection.I2cReadRegister([]byte{TCS34725_ADDR, TCS34725_BDATAL_R}, 2)
+	fmt.Printf("blueData %X [%X]\n", blueData, errRed)
 
 	return redData, greenData, blueData, []error{errRed, errGreen, errBlue}
 }
