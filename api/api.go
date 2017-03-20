@@ -11,6 +11,7 @@ import (
 
 	"github.com/bmizerany/pat"
 	"github.com/talmai/gobot"
+	"github.com/talmai/gobot/api/riot"
 	"github.com/talmai/gobot/api/robeaux"
 )
 
@@ -137,7 +138,32 @@ func (a *API) Start() {
 	a.Get("/css/:a/:b", a.robeaux)
 	a.Get("/partials/:a", a.robeaux)
 
+	a.Get("/riot/sensors/:id", a.riot)
+	a.Get("/riot/sensors", a.riot)
+	a.Post("/riot/sensors", a.riot)
+	a.Get("/riot/digital/input/:channel", a.riot)   // channels [0-3]
+	a.Get("/riot/digital/output/:channel", a.riot)  // channels [0-1]
+	a.Post("/riot/digital/output/:channel", a.riot) // channels [0-1]
+	a.Get("/riot/digital/relay/:channel", a.riot)   // channels [0-1]
+	a.Post("/riot/digital/relay/:channel", a.riot)  // channels [0-1]
+	a.Get("/riot/analog/input/:channel", a.riot)    // channels [0-3]
+	a.Get("/riot/analog/output/:channel", a.riot)   // channels [0-1]
+	a.Post("/riot/analog/output/:channel", a.riot)  // channels [0-1]
+	a.Get("/riot/", a.riot)
+
 	a.start(a)
+}
+
+// riot returns handler for riot routes.
+// Writes asset in response and sets correct header
+func (a *API) riot(res http.ResponseWriter, req *http.Request) {
+	path := req.URL.Path
+	buf, err := riot.CommandPath(path[1:], res, req)
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusNotFound)
+		return
+	}
+	res.Write(buf)
 }
 
 // robeaux returns handler for robeaux routes.
